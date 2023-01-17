@@ -8,32 +8,28 @@ set -o pipefail
 # Debug
 set -x
 
-# Parse params
-BUILD_DIR=$1
-CACHE_DIR=$2
-ENV_DIR=$3
-
 # Set buildpack dir
 BUILDPACK_DIR=$(cd "$(dirname "$0")"; cd ..; pwd)
 
+# Parse params
+BUILD_DIR=$1
+CACHE_DIR=$1
+
 # Set pinned version
 PINNED_VERSION="0.43.0"
+VERSION="$OTELCOL_VERSION"
 
 # If a version hasn't been specified, use the pinned version
-if [ -f "$ENV_DIR/OTELCOL_VERSION" ]; then
-  VERSION=$(cat "$ENV_DIR/OTELCOL_VERSION")
-else
+if [ "$VERSION" == "" ]; then
   VERSION="$PINNED_VERSION"
 fi
 
 OTELCOL_BINARY="otelcol"
 # If the user hasn't request otelcol-contrib explicetely, use core
-if [ -f "$ENV_DIR/OTELCOL_CONTRIB" ]; then
-  OTELCOL_CONTRIB=$(cat "$ENV_DIR/OTELCOL_CONTRIB")
-  if [ "$OTELCOL_CONTRIB" == "true" ]; then
-    OTELCOL_BINARY="otelcol-contrib"
-  fi
+if [ "$OTELCOL_CONTRIB" == "true" ]; then
+  OTELCOL_BINARY="otelcol-contrib"
 fi
+
 
 # Download
 if [ ! -f "$CACHE_DIR/${OTELCOL_BINARY}-${VERSION}" ] || [ -n "$NOCACHE_OTELCOL" ]; then
